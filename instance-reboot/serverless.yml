@@ -1,0 +1,14 @@
+service: instance-reboot
+provider:
+  name: aws
+  runtime: python3.6
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "cloudformation:DescribeStackResources"
+        - "autoscaling:DescribeAutoScalingGroups"
+        - "ec2:RebootInstances"
+      Resource: "*"
+functions:
+  reboot:
+    handler: handler.reboot

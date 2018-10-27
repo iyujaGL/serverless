@@ -1,4 +1,5 @@
 {
   "version": 0,
-  "stack": "d-quaff3"
+  "stack": "cloud_formation_stack_name",
+  "dryrun": true 
 }

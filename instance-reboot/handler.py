@@ -5,32 +5,60 @@ from botocore.exceptions import ClientError
 
 def reboot(event, context):
 
-    stackName = event['stack']
+    stack_name = event['stack']
     cfn = client('cloudformation')
     asg = client('autoscaling')
     ec2 = client('ec2')
 
-    asgName = cfn.describe_stack_resources(
-                StackName=stackName,
-                LogicalResourceId="appAsg"
-            )['StackResources'][0]['PhysicalResourceId']
 
-    asgInstances = asg.describe_auto_scaling_groups(
-                AutoScalingGroupNames=[
-                        asgName,
-                    ]
-            )['AutoScalingGroups'][0]['Instances']
+    try:
+        print("Listing resources in: ", stack_name)
 
-    instanceIdList = [instance['InstanceId'] for instance in asgInstances]
+        stack_resources = cfn.list_stack_resources(
+            StackName=stack_name
+        )['StackResourceSummaries']
 
-    ec2.reboot_instances(
-            InstanceIds=instanceIdList,
-            DryRun=False
+    except ClientError as e:
+        message = e.response['Error']
+
+
+    asg_list = []
+
+
+    try:
+        for resource in stack_resources:
+            if resource['ResourceType'] == "AWS::AutoScaling::AutoScalingGroup":
+                print("Found AutoScalingGroup: ", resource['PhysicalResourceId'])
+                asg_list.append(resource['PhysicalResourceId'])
+
+    except ClientError as e:
+        message = e.response['Error']
+
+
+    try:
+        autoscaling_groups = asg.describe_auto_scaling_groups(
+            AutoScalingGroupNames=asg_list
+        )['AutoScalingGroups']
+
+        for autoscaling_group in autoscaling_groups:
+            instance_id_list = [instance['InstanceId'] for instance in autoscaling_group['Instances']]
+
+            print("Rebooting instances: ", instance_id_list)
+
+            ec2.reboot_instances(
+                InstanceIds=instance_id_list,
+                DryRun=event['dryrun']
             )
+            message = 'Instances: ' + ''.join(instance_id_list) + ' rebooted'
 
-    body = { 
-        "message": "reboot successful"        
+    except ClientError as e:
+        message = e.response['Error']
+
+
+    body = {
+        "message": message
     }
+
 
     response = {
         "statusCode": 200,

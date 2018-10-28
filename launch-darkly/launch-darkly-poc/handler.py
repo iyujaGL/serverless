@@ -17,9 +17,9 @@ def flag(event, context):
     ldclient.set_sdk_key(os.environ['SDKKEY'])
 
     user = {
-        "key": "ivan.yuja@gorillalogic.com",
-        "firstName": "Ivan",
-        "lastName": "Yuja",
+        "key": "jon@doe.me",
+        "firstName": "Jon",
+        "lastName": "Doe",
         "custom": {
             "groups": "beta_testers"
         }

@@ -9,7 +9,7 @@ functions:
     handler: handler.flag
     events:
       - http:
-          path: position 
+          path: flag-position 
           method: get
 plugins:
   - serverless-python-requirements

@@ -1,8 +1,8 @@
 import json
 import logging
 import sys
-import ldclient
 import os
+import ldclient
 
 
 def flag(event, context):
@@ -17,22 +17,22 @@ def flag(event, context):
     ldclient.set_sdk_key(os.environ['SDKKEY'])
 
     user = {
-      "key": "ivan.yuja@gorillalogic.com",
-      "firstName": "Ivan",
-      "lastName": "Yuja",
-      "custom": {
-        "groups": "beta_testers"
-      }
+        "key": "ivan.yuja@gorillalogic.com",
+        "firstName": "Ivan",
+        "lastName": "Yuja",
+        "custom": {
+            "groups": "beta_testers"
+        }
     }
 
     flag_hoisted = ldclient.get().variation("flag-hoisted", user, False)
 
     if flag_hoisted:
-      flag_status = "Hoisted"
+        flag_status = "Hoisted"
     else:
-      flag_status = "Lowered"
+        flag_status = "Lowered"
 
-    ldclient.get().close() # close the client before exiting the program - ensures that all events are delivered
+    ldclient.get().close()
 
 
     body = {

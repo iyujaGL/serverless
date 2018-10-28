@@ -1,0 +1,18 @@
+service: launch-darkly-poc
+provider:
+  name: aws
+  runtime: python3.6
+  environment:
+    SDKKEY: <SDK_KEY>
+functions:
+  flag:
+    handler: handler.flag
+    events:
+      - http:
+          path: position 
+          method: get
+plugins:
+  - serverless-python-requirements
+custom:
+  pythonRequirements:
+    dockerizePip: true
